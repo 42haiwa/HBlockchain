@@ -1,0 +1,9 @@
+<component name="ArtifactManager">
+  <artifact type="jar" name="HBlockchain:jar">
+    <output-path>$PROJECT_DIR$/out/artifacts/HBlockchain_jar</output-path>
+    <root id="archive" name="HBlockchain.jar">
+      <element id="module-output" name="HBlockchain" />
+      <element id="extracted-dir" path="$MAVEN_REPOSITORY$/com/google/code/gson/gson/2.8.6/gson-2.8.6.jar" path-in-jar="/" />
+    </root>
+  </artifact>
+</component>
