@@ -8,6 +8,7 @@ import java.sql.Timestamp;
 
 public class Transaction {
 
+    private String prevHash;
     private String toHashedAddress;
     private String fromHashedAddress;
     private String fromAddress;
@@ -16,7 +17,8 @@ public class Transaction {
     private String signature;
     private String hash;
 
-    public Transaction(String toAddress, String fromAddress, float amount, PrivateKey privateKey) {
+    public Transaction(String prevHash, String toAddress, String fromAddress, float amount, PrivateKey privateKey) {
+        this.prevHash = prevHash;
         this.toHashedAddress = RsaEncryption.calculateAddress(toAddress);
         this.fromHashedAddress = RsaEncryption.calculateAddress(fromAddress);
         this.fromAddress = fromAddress;
@@ -29,7 +31,7 @@ public class Transaction {
     private String calculateSignature(PrivateKey privateKey) {
         if (privateKey == null) return null;
         StringBuilder stringBuilder = new StringBuilder();
-        stringBuilder.append(this.toHashedAddress).append(this.fromHashedAddress).append(this.fromAddress).append(this.amount).append(this.timestamp);
+        stringBuilder.append(this.prevHash).append(this.toHashedAddress).append(this.fromHashedAddress).append(this.fromAddress).append(this.amount).append(this.timestamp);
         try {
             return RsaEncryption.sign(stringBuilder.toString(), privateKey);
         } catch (Exception e) {
@@ -39,7 +41,11 @@ public class Transaction {
     }
 
     public String calculateHash() {
-        return Sha256.Sha256(this.toHashedAddress + this.fromHashedAddress + this.fromAddress + this.amount + this.timestamp + this.signature);
+        return Sha256.Sha256(this.prevHash + this.toHashedAddress + this.fromHashedAddress + this.fromAddress + this.amount + this.timestamp + this.signature);
+    }
+
+    public String getPrevHash() {
+        return prevHash;
     }
 
     public String getToAddress() {

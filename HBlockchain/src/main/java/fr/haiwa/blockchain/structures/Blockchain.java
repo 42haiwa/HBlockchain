@@ -42,6 +42,16 @@ public class Blockchain {
         for (Transaction tx : this.pendingTxs) {
             System.out.println(new GsonBuilder().setPrettyPrinting().create().toJson(tx));
             if (tx.getFromAddress().equalsIgnoreCase("COINBASE")) {
+                boolean fake = false;
+                for (int i = 0; i < this.pendingTxs.size(); i++) {
+                    if (this.pendingTxs.get(i).getFromAddress().equalsIgnoreCase("COINBASE")) {
+                        if (this.blocks.get(this.blocks.size() - 1).getTxs().size() != 0) {
+                            if (this.pendingTxs.get(i).getPrevHash().equals(this.getLatestBlock().getLatestTx().getHash())) break;
+                        }
+                        if (this.pendingTxs.get(i) != tx) fake = true;
+                    }
+                }
+                if (fake) continue;
                 block.addTx(tx);
             }
             if (this.getAmount(tx.getFromAddress()) >= tx.getAmount()) {
@@ -57,7 +67,12 @@ public class Blockchain {
         block.mineBlock();
         blocks.add(block);
         pendingTxs.clear();
-        this.addTransaction(new Transaction(rewardAddress, "COINBASE", Main.REWARD, null));
+        System.out.println(new GsonBuilder().setPrettyPrinting().serializeNulls().create().toJson(this.blocks.get(this.blocks.size() - 2)));
+        if (this.blocks.get(this.blocks.size() - 1).getTxs().size() == 0) {
+            this.addTransaction(new Transaction("0", rewardAddress, "COINBASE", Main.REWARD, null));
+            return;
+        }
+        this.addTransaction(new Transaction(this.blocks.get(this.blocks.size() - 1).getLatestTx().getHash(), rewardAddress, "COINBASE", Main.REWARD, null));
     }
 
     public Block createGenesisBlock() {

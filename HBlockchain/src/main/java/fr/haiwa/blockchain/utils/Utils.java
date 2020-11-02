@@ -1,5 +1,10 @@
 package fr.haiwa.blockchain.utils;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+
 public class Utils {
 
     public static void startHelp() {
@@ -14,7 +19,13 @@ public class Utils {
         System.out.println("Mode 7: Test Rsa decryption with private key");
         System.out.println("Mode 8: Get the path of the Blockchain");
         System.out.println("Mode 9: Generate Wallet");
+        System.out.println("Mode 10: Contiue to mining current Blockchain");
         System.out.println("Mode 98: Test Mode");
         System.out.println("Mode 99: Exit");
+    }
+
+    public static void createFolder(String pathStr) throws IOException {
+        Path path = Paths.get(pathStr);
+        Files.createDirectories(path);
     }
 }

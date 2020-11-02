@@ -86,4 +86,8 @@ public class Block {
     public List<Transaction> getTxs() {
         return txs;
     }
+
+    public Transaction getLatestTx() {
+        return this.txs.get(this.txs.size() - 1);
+    }
 }

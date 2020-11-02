@@ -12,6 +12,10 @@ import fr.haiwa.blockchain.wallet.WalletMaker;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.security.KeyPair;
 import java.util.Base64;
 import java.util.Scanner;
@@ -32,7 +36,7 @@ public class Main {
     public static String PRIVATE_KEY_PATH = PathGetter.getConstPrivateKeyPath();
     public static String PUBLIC_KEY_PATH = PathGetter.getConstPublicKeyPath();
 
-    public Main() {
+    public Main() throws IOException {
         this.gson = new GsonBuilder().setPrettyPrinting().serializeNulls().create();
         this.log = new Log();
     }
@@ -56,9 +60,10 @@ public class Main {
     public void testTx() throws FileNotFoundException {
         Blockchain blockchain = new Blockchain();
         blockchain.createGenesisBlock();
-        blockchain.addTransaction(new Transaction(new WalletGetter(new File(WALLET_PATH + "/wallet.pub")).getPublicKey(0), "COINBASE", REWARD, null));
+        Transaction tx = new Transaction("0", new WalletGetter(new File(WALLET_PATH + "/wallet.pub")).getPublicKey(0), "COINBASE", REWARD, null);
+        blockchain.addTransaction(tx);
         blockchain.miningPendingTxs(new WalletGetter(new File(WALLET_PATH + "/wallet.pub")).getPublicKey(0));
-        blockchain.addTransaction(new Transaction(new WalletGetter(new File(WALLET_PATH + "/wallet.pub")).getPublicKey(0), "COINBASE", REWARD, null));
+        blockchain.addTransaction(new Transaction(tx.getHash(), new WalletGetter(new File(WALLET_PATH + "/wallet.pub")).getPublicKey(0), "COINBASE", REWARD, null));
         blockchain.miningPendingTxs(new WalletGetter(new File(WALLET_PATH + "/wallet.pub")).getPublicKey(0));
         System.out.println(gson.toJson(blockchain));
         new FileManager(blockchain).writeBlockchain();
@@ -144,19 +149,40 @@ public class Main {
         }
     }
 
+    public void createFolder() throws IOException {
+        Path path = Paths.get(DATA_PATH);
+        Files.createDirectories(path);
+        path = Paths.get(WALLET_PATH);
+        Files.createDirectories(path);
+    }
+
+    public void continueBlockchain() throws FileNotFoundException {
+        Blockchain blockchain = new FileManager().readBlockchain();
+
+        System.out.println("How iteration do you want ? ");
+        int n = new Scanner(System.in).nextInt();
+
+        for (int i = 0; i < n; i++) {
+            blockchain.miningPendingTxs(new WalletGetter(new File(WALLET_PATH + "/wallet.pub")).getPublicKey(0));
+            new FileManager(blockchain).writeBlockchain();
+        }
+        System.out.println(gson.toJson(blockchain));
+    }
+
     public void nedgeCoin() throws FileNotFoundException {
         Blockchain blockchain = new Blockchain();
         blockchain.createGenesisBlock();
 
         for (int i = 0; i < 100; i++) {
             blockchain.miningPendingTxs(new WalletGetter(new File(WALLET_PATH + "/wallet.pub")).getPublicKey(0));
+            new FileManager(blockchain).writeBlockchain();
         }
         System.out.println(gson.toJson(blockchain));
-        new FileManager(blockchain).writeBlockchain();
     }
 
-    public static void main(String[] args) throws FileNotFoundException {
+    public static void main(String[] args) throws IOException {
         Main main = new Main();
+        main.createFolder();
 
         main.init();
         Utils.startHelp();
@@ -192,6 +218,9 @@ public class Main {
                 break;
             case 9:
                 main.generateWallet();
+                break;
+            case 10:
+                main.continueBlockchain();
                 break;
             case 98:
                 //Test mode

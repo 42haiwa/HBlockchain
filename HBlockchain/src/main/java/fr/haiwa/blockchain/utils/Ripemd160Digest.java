@@ -1,6 +1,6 @@
 package fr.haiwa.blockchain.utils;
 
-import org.bouncycastle.crypto.digests.RIPEMD160Digest;
+import fr.haiwa.blockchain.crypto.RIPEMD160Digest;
 import org.bouncycastle.util.encoders.Hex;
 
 import java.io.ByteArrayOutputStream;

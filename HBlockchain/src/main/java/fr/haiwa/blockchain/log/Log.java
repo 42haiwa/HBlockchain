@@ -1,6 +1,7 @@
 package fr.haiwa.blockchain.log;
 
 import fr.haiwa.blockchain.Main;
+import fr.haiwa.blockchain.utils.Utils;
 
 import java.io.File;
 import java.io.FileWriter;
@@ -18,11 +19,12 @@ public class Log {
     private File file;
     private FileWriter fileWriter;
 
-    public Log() {
+    public Log() throws IOException {
+        Utils.createFolder(Main.DATA_PATH + "Log");
         this.simpleDateFormat = new SimpleDateFormat("yyyy.MM.dd.HH.mm.ss");
         this.timestamp = new Timestamp(System.currentTimeMillis());
         this.date = simpleDateFormat.format(timestamp);
-        this.file = new File(Main.DATA_PATH + "/Log/log" + this.date);
+        this.file = new File(Main.DATA_PATH + "Log/log" + this.date);
         try {
             this.fileWriter = new FileWriter(this.file);
         } catch (IOException e) {
